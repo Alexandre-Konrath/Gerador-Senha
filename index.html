@@ -1,0 +1,238 @@
+<!-- html:5 -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <!-- link da fonte -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@600&family=Inter:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+        <!-- importando html -> css -->
+
+    <link rel="stylesheet" href="reset.css" />
+    <link rel="stylesheet" href="style.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <!-- tag semantica -->
+    <main>
+      <section class="hero">
+        <!-- título -->
+        
+        <h1 class="title">Gerador de senha</h1>
+        <p class="subtitle">
+          Utilize o meu gerador online para criar uma senha forte e segura.
+        </p>
+      </section>
+
+              <!-- deixar o slider embaixo da caixa de senha  -->
+      <section class="box">
+        <div class="password">
+          <div class="text">
+            <!-- caixa onde vai as senhas (está vazia)-->
+            <input type="text" name="password" id="password" class="cu2"/>
+          </div>
+          <div class="actions">
+            <!-- botoes de copiar com fotos -->
+            <button id="copy-1">
+              <img src="copy.svg" width="42" />
+            </button>
+            <button id="renew">
+              <img src="renew.svg" width="42" />
+            </button>
+          </div>
+        </div>
+        <!-- cor do slider verde, amarelo, azul -->
+        <div class="security-indicator">
+          <div id="security-indicator-bar" class="bar" ></div>
+        </div>
+      </section>
+      <!-- novo titulo personalizar -->
+      <section class="box customize">
+        <h3 class="title" style="color: #810202;">Personalizar</h3>
+        <div class="actions">
+          <div class="password-length">
+            <p>Tamanho: <span id="password-length-text">16</span></p>
+            <!-- evento slider -->
+            <input
+              type="range"
+              name="password-length"
+              id="password-length"
+              class="slider"
+              value="16"
+              min="4"
+              max="64"
+            />
+          </div>
+            <!-- caixas de Maiúsculas -->
+          <div class="config">
+            <label class="checkbox-container">
+              <span class="text">Maiúsculas</span>
+              <input type="checkbox" id="uppercase-check" checked />
+              <span class="checkmark"></span>
+            </label>
+            <!-- caixa de Números -->
+            <label class="checkbox-container">
+              <span class="text">Números</span>
+              <input type="checkbox" id="number-check" checked />
+              <span class="checkmark"></span>
+            </label>
+            <!-- caixa de Símbulos -->
+            <label class="checkbox-container">
+              <span class="text">Símbolos</span>
+              <input type="checkbox" id="symbol-check" checked />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+      <div class="submit">
+      <!-- botão copiar senha -->
+      <button id="copy-2">Copiar senha</button>
+    </div>
+    </main>
+    <script>
+      // --- scood global ---
+
+      // coloca a senha aleatória gerada da caixa vazia 
+      const inputEl = document.querySelector("#password")
+
+      // pegar o id dos maiusulos numeros e simbolos para por no if dps
+      const upperCaseCheckEl = document.querySelector("#uppercase-check")
+      const numebrCaseCheckEl = document.querySelector("#number-check")
+      const symbolCaseCheckEl = document.querySelector("#symbol-check")
+      const securityIndicatorBarEl = document.querySelector("#security-indicator-bar")
+      // gera essa variavel e trava a senha com 16 dgitos
+      let passwordLength = 16
+
+      // todas as senhas possíveis
+      function generatePassword() {
+
+        let chars ="abcdefghjkmnpqrstuvwxyz"
+
+        // função if para tirar os maiúisculos, minúsculos ou símbolos 
+          const upperCaseChars = "ABCDEFGHJKLMNPQRSTUVWXYZ"
+          const numberChars = "1234567890"
+          const symbolChars = "?!@&*()[]"
+
+          if (upperCaseChars.checked) {
+            chars += upperCaseChars
+          }
+          if (numebrCaseCheckEl.checked) {
+            chars += numberChars
+          }
+          if (symbolCaseCheckEl.checked) {
+            chars += symbolChars
+          }
+
+        // so posso usar essa function/let password dentro deste scooped 
+        let password = ""
+
+        /* limite de senha de 0 até passwordLength = 8 
+        gerador de senha aleatório com os caracteres de cima*/
+
+        for (let i = 0; i < passwordLength; i++) {
+          const randomNumber = Math.floor(Math.random() * chars.length)
+          password += chars.substring(randomNumber, randomNumber + 1)
+        }
+
+        inputEl.value = password
+
+        calculateQuality()
+        calculateFontsize()
+      }
+
+      // calcula a qualidade da senha
+      function calculateQuality () {
+        // 20% -> critial  =>  100% -> safe
+        //  Tamanho*0.25% + Maiusculos*0.15% + Numeros*0.25% + Simbolos*0.35% == 100%
+
+        const percent = Math.round(
+          (passwordLength / 64) * 25 + 
+          (upperCaseCheckEl.checked ? 15 : 0) +
+          (numebrCaseCheckEl.checked ? 25 : 0) +
+          (symbolCaseCheckEl.checked ? 35 : 0)
+          )
+
+        // estamos manipulando
+        securityIndicatorBarEl.style.width = `${percent}%`
+
+        if (percent > 69) {
+          //safe
+          securityIndicatorBarEl.classList.remove("critical")
+          securityIndicatorBarEl.classList.remove("warning")
+          securityIndicatorBarEl.classList.add("safe")
+          //warning
+        } else if (percent > 50) {
+          securityIndicatorBarEl.classList.remove("critical")
+          securityIndicatorBarEl.classList.add("warning")
+          securityIndicatorBarEl.classList.remove("safe")
+          //critical
+        } else {
+          securityIndicatorBarEl.classList.add("critical")
+          securityIndicatorBarEl.classList.remove("warning")
+          securityIndicatorBarEl.classList.remove("safe")
+        }
+
+        //deixar a barra 100% preenchida
+        if (percent >= 100) {
+          securityIndicatorBarEl.classList.add("completed")
+        }else {
+          securityIndicatorBarEl.classList.remove("completed")
+        }
+      } 
+
+      function calculateFontsize() {
+        if (passwordLength > 50) {
+          inputEl.classList.remove("font-sm")
+          inputEl.classList.remove("font-xs")
+          inputEl.classList.add("font-xxs")
+        } else if (passwordLength > 38) {
+          inputEl.classList.remove("font-sm")
+          inputEl.classList.add("font-xs")
+          inputEl.classList.remove("font-xxs")
+        } else if (passwordLength > 25) {
+          inputEl.classList.add("font-sm")
+          inputEl.classList.remove("font-xs")
+          inputEl.classList.remove("font-xxs")
+        } else { 
+          inputEl.classList.remove("font-sm")
+          inputEl.classList.remove("font-xs")
+          inputEl.classList.remove("font-xxs")
+        }
+        
+      }
+
+      // copiar o texto que esta na caixa/inputEl.value
+      function copy() {
+        navigator.clipboard.writeText(inputEl.value)
+      }
+
+      // gera a senha aleatoria conforme mexe/arrasta o slider
+      const passwordLengthEl = document.querySelector("#password-length")
+      passwordLengthEl.addEventListener("input", function () {
+        passwordLength = passwordLengthEl.value
+        document.querySelector("#password-length-text").innerText = passwordLength
+
+        generatePassword()
+      })
+
+      // evento de click para as caixas de maiúisculos, minúsculos ou símbolos 
+      upperCaseCheckEl.addEventListener("click" , generatePassword)
+      numebrCaseCheckEl.addEventListener("click" , generatePassword)
+      symbolCaseCheckEl.addEventListener("click" , generatePassword)
+
+      // função de copiar no evendo click
+      document.querySelector("#copy-1").addEventListener("click", copy)
+      document.querySelector("#renew").addEventListener("click", generatePassword)
+      document.querySelector("#copy-2").addEventListener("click", copy)
+
+      generatePassword()
+    </script>
+  </body>
+</html>
